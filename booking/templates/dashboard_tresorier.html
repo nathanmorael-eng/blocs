@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Espace Trésorier</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+    
+    <h1>Tableau de bord du Trésorier</h1>
+    <div style="background-color: #f1c40f; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <strong>État du stock :</strong> Il vous reste actuellement <b>{{ stock_disponible }}</b> places disponibles à distribuer.
+        <br>
+        <a href="/admin/booking/billetarkose/add/" target="_blank" style="color: #d35400; font-size: 0.9em;">[+ Ajouter de nouveaux billets dans la base]</a>
+    </div>
+    <hr>
+
+    <h2>1. Demandes de création de compte (Extérieurs)</h2>
+    <ul>
+        {% for compte in comptes %}
+            <li style="margin-bottom: 15px;">
+                <b>{{ compte.email }}</b>
+                <br>
+                <i style="color: #7f8c8d;">Justification : {{ compte.profil.justification|default:"Aucune justification fournie." }}</i>
+                <br>
+                <a href="{% url 'valider_compte' compte.id %}" style="color: green;">[ Activer ]</a>
+                <a href="{% url 'refuser_compte' compte.id %}" style="color: red; margin-left: 10px;" onclick="return confirm('Supprimer définitivement ce compte ?')">[ Refuser ]</a>
+            </li>
+        {% empty %}
+            <p style="color: gray;">Aucun compte en attente.</p>
+        {% endfor %}
+    </ul>
+
+    <h2>2. Commandes de places en attente de virement</h2>
+    <ul>
+        {% for commande in commandes %}
+            <li style="margin-bottom: 15px;">
+                <b>{{ commande.utilisateur.email }}</b> a demandé <b>{{ commande.nombre_de_places }}</b> place(s)
+                le {{ commande.date_demande|date:"d/m/Y à H:i" }}.
+                <a href="{% url 'valider_commande' commande.id %}" style="color: green; margin-left: 15px;">[ Valider le paiement ]</a>
+                <a href="{% url 'refuser_commande' commande.id %}" style="color: red; margin-left: 10px;" onclick="return confirm('Supprimer cette commande ?')">[ Refuser ]</a>
+            </li>
+        {% empty %}
+            <p style="color: gray;">Aucune commande en attente.</p>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>

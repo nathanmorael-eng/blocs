@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscription</title>
+</head>
+<body>
+    <h1>Créer un compte</h1>
+    <!-- Le formulaire s'envoie à lui-même en POST -->
+    <form method="POST">
+        {% csrf_token %} <!-- Sécurité obligatoire de Django -->
+        {{ form.as_p }} <!-- Affiche le formulaire généré par Django -->
+        <button type="submit">S'inscrire</button>
+    </form>
+<br>
+<hr>
+<p>Vous avez déjà un compte ? <a href="/connexion/">Se connecter ici</a></p>
+</body>
+</html>
