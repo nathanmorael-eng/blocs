@@ -1,22 +1,115 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Connexion - Revente de places</title>
-</head>
-<body style="font-family: Arial, sans-serif; padding: 20px;">
-    
-    <h1>Se connecter</h1>
-    
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-            Connexion
-        </button>
-    </form>
-    
-    <br>
-    <p>Pas encore de compte ? <a href="/inscription/">Créer une demande d'inscription</a></p>
+{% extends "base.html" %}
+{% block title %}Connexion — Arkose BLOCS{% endblock %}
 
-</body>
-</html>
+{% block extra_css %}
+<style>
+    .auth-layout {
+        min-height: calc(100vh - 62px);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .auth-side {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 60px;
+    }
+
+    .auth-panel { width: 100%; max-width: 400px; }
+
+    .auth-visual {
+        background:
+            repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 39px,
+                rgba(255,255,255,0.02) 39px,
+                rgba(255,255,255,0.02) 40px
+            );
+        border-left: 1px solid rgba(255,255,255,0.06);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-visual-title {
+        font-family: var(--font-display);
+        font-size: clamp(4rem, 8vw, 8rem);
+        line-height: 0.9;
+        color: rgba(255,255,255,0.06);
+        user-select: none;
+    }
+
+    .auth-title {
+        font-family: var(--font-display);
+        font-size: 2.8rem;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+    }
+
+    .auth-sub {
+        font-size: 0.85rem;
+        color: var(--gray-400);
+        margin-bottom: 40px;
+        font-weight: 300;
+    }
+
+    .auth-footer-link {
+        margin-top: 28px;
+        font-size: 0.82rem;
+        color: var(--gray-600);
+    }
+    .auth-footer-link a {
+        color: var(--gray-200);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        padding-bottom: 1px;
+        transition: border-color 0.2s;
+    }
+    .auth-footer-link a:hover { border-color: var(--white); }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-16px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    .auth-panel { animation: fadeIn 0.5s ease both; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+    <div class="auth-side">
+        <div class="auth-panel">
+            <p class="overline" style="margin-bottom: 16px;">Espace membre</p>
+            <h1 class="auth-title">Connexion</h1>
+            <p class="auth-sub">Accédez à votre espace de réservation.</p>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 28px; justify-content: center;">
+                    Se connecter →
+                </button>
+            </form>
+
+            <p class="auth-footer-link">
+                Pas encore de compte ? <a href="/inscription/">Créer un compte</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-visual">
+        <div class="auth-visual-title">
+            ARKOSE<br>BLOCS<br>CS
+        </div>
+    </div>
+</div>
+{% endblock %}

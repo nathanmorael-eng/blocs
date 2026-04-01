@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
 from .forms import CommandeForm, InscriptionAssosForm, ConnexionEmailForm
 from django.core.mail import send_mail
+from django.contrib import messages
 
 # 1. Page d'accueil (Publique)
 def accueil(request):
@@ -197,4 +198,36 @@ def refuser_commande(request, commande_id):
         billet.save()
 
     commande.delete()
+    return redirect('dashboard_tresorier')
+
+@user_passes_test(est_tresorier)
+def importer_billets(request):
+    if request.method == 'POST' and request.FILES.get('fichier_excel'):
+        fichier = request.FILES['fichier_excel']
+        
+        try:
+            from openpyxl import load_workbook
+            wb = load_workbook(fichier)
+            ws = wb.active
+            
+            importes = 0
+            doublons = 0
+            
+            for row in ws.iter_rows(min_row=2):  # min_row=2 pour sauter le header
+                code = row[1].value  # Colonne B (index 1)
+                
+                if code:
+                    code = str(code).strip()
+                    # Crée le billet seulement s'il n'existe pas déjà
+                    _, created = BilletArkose.objects.get_or_create(code_secret=code)
+                    if created:
+                        importes += 1
+                    else:
+                        doublons += 1
+            
+            messages.success(request, f"{importes} billet(s) importé(s) avec succès. {doublons} doublon(s) ignoré(s).")
+        
+        except Exception as e:
+            messages.error(request, f"Erreur lors de l'import : {str(e)}")
+    
     return redirect('dashboard_tresorier')

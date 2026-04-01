@@ -11,4 +11,5 @@ urlpatterns = [
     path('tresorier/valider-commande/<int:commande_id>/', views.valider_commande, name='valider_commande'),
     path('tresorier/refuser-compte/<int:user_id>/', views.refuser_compte, name='refuser_compte'),
     path('tresorier/refuser-commande/<int:commande_id>/', views.refuser_commande, name='refuser_commande'),
+    path('tresorier/importer/', views.importer_billets, name='importer_billets'),
 ]

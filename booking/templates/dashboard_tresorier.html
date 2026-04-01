@@ -1,47 +1,252 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Espace Trésorier</title>
-</head>
-<body style="font-family: Arial, sans-serif; padding: 20px;">
+{% extends "base.html" %}
+{% block title %}Trésorier — Arkose BLOCS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dash-layout {
+        padding: 60px 48px 80px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 48px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .dash-title {
+        font-family: var(--font-display);
+        font-size: 3rem;
+        letter-spacing: 0.04em;
+        line-height: 1;
+    }
+
+    .stock-badge {
+        text-align: right;
+    }
+    .stock-num {
+        font-family: var(--font-display);
+        font-size: 3rem;
+        line-height: 1;
+        color: var(--white);
+    }
+    .stock-num.low { color: #d45555; }
+    .stock-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gray-600);
+        margin-bottom: 6px;
+    }
+    .stock-link {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1px;
+        transition: color 0.2s;
+    }
+    .stock-link:hover { color: var(--gray-200); }
+
+    /* ── SECTION ── */
+    .dash-section { margin-bottom: 52px; }
+
+    .dash-section-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .dash-section-title {
+        font-family: var(--font-display);
+        font-size: 1.4rem;
+        letter-spacing: 0.06em;
+    }
+
+    .badge-count {
+        background: rgba(255,255,255,0.07);
+        color: var(--gray-400);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
     
-    <h1>Tableau de bord du Trésorier</h1>
-    <div style="background-color: #f1c40f; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-        <strong>État du stock :</strong> Il vous reste actuellement <b>{{ stock_disponible }}</b> places disponibles à distribuer.
-        <br>
-        <a href="/admin/booking/billetarkose/add/" target="_blank" style="color: #d35400; font-size: 0.9em;">[+ Ajouter de nouveaux billets dans la base]</a>
+
+    /* ── ROWS ── */
+    .item-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 3px;
+        margin-bottom: 8px;
+        background: rgba(255,255,255,0.02);
+        transition: background 0.15s;
+    }
+    .item-row:hover { background: rgba(255,255,255,0.035); }
+
+    .item-main { flex: 1; }
+
+    .item-email {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--white);
+        margin-bottom: 4px;
+    }
+
+    .item-meta {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        font-weight: 300;
+    }
+
+    .item-justif {
+        font-size: 0.78rem;
+        color: var(--gray-400);
+        font-style: italic;
+        margin-top: 5px;
+        max-width: 480px;
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: 24px;
+    }
+
+    .empty-state {
+        padding: 32px 24px;
+        border: 1px dashed rgba(255,255,255,0.08);
+        border-radius: 3px;
+        text-align: center;
+        color: var(--gray-600);
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .item-row { animation: fadeUp 0.3s ease both; }
+    .item-row:nth-child(2) { animation-delay: 0.05s; }
+    .item-row:nth-child(3) { animation-delay: 0.1s; }
+    .item-row:nth-child(4) { animation-delay: 0.15s; }
+</style>
+{% endblock %}
+
+<!-- Messages flash -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}" style="margin-bottom: 24px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Import Excel -->
+<div class="dash-section">
+    <div class="dash-section-header">
+        <h2 class="dash-section-title">Importer des billets</h2>
     </div>
-    <hr>
+    <div class="card" style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+        <div>
+            <p style="font-size: 0.85rem; color: var(--gray-400); font-weight: 300; line-height: 1.6;">
+                Importez un fichier Excel Arkose. Les codes de la colonne B seront ajoutés au stock.<br>
+                <span style="font-size: 0.75rem; color: var(--gray-600);">Les doublons sont automatiquement ignorés.</span>
+            </p>
+        </div>
+        <form method="POST" action="{% url 'importer_billets' %}" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+            {% csrf_token %}
+            <label for="fichier_excel" class="btn btn-outline btn-sm" style="cursor: pointer; margin: 0;">
+                Choisir un fichier
+            </label>
+            <input type="file" id="fichier_excel" name="fichier_excel" accept=".xlsx,.xls" style="display: none;" onchange="this.nextElementSibling.textContent = this.files[0]?.name || 'Aucun fichier'; ">
+            <span style="font-size: 0.78rem; color: var(--gray-600); min-width: 120px;">Aucun fichier</span>
+            <button type="submit" class="btn btn-primary btn-sm">Importer →</button>
+        </form>
+    </div>
+</div>
 
-    <h2>1. Demandes de création de compte (Extérieurs)</h2>
-    <ul>
+{% block content %}
+<div class="dash-layout">
+
+    <div class="dash-header">
+        <div>
+            <p class="overline" style="margin-bottom: 10px;">Espace trésorier</p>
+            <h1 class="dash-title">Tableau de bord</h1>
+        </div>
+        <div class="stock-badge">
+            <p class="stock-label">Stock disponible</p>
+            <p class="stock-num {% if stock_disponible == 0 %}low{% endif %}">{{ stock_disponible }}</p>
+            <a href="/admin/booking/billetarkose/add/" target="_blank" class="stock-link">+ Ajouter des billets</a>
+        </div>
+    </div>
+
+    <!-- COMPTES EN ATTENTE -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <h2 class="dash-section-title">Comptes en attente</h2>
+            <span class="badge-count">{{ comptes|length }}</span>
+        </div>
+
         {% for compte in comptes %}
-            <li style="margin-bottom: 15px;">
-                <b>{{ compte.email }}</b>
-                <br>
-                <i style="color: #7f8c8d;">Justification : {{ compte.profil.justification|default:"Aucune justification fournie." }}</i>
-                <br>
-                <a href="{% url 'valider_compte' compte.id %}" style="color: green;">[ Activer ]</a>
-                <a href="{% url 'refuser_compte' compte.id %}" style="color: red; margin-left: 10px;" onclick="return confirm('Supprimer définitivement ce compte ?')">[ Refuser ]</a>
-            </li>
+        <div class="item-row">
+            <div class="item-main">
+                <p class="item-email">{{ compte.email }}</p>
+                <p class="item-justif">{{ compte.profil.justification|default:"Aucune justification fournie." }}</p>
+            </div>
+            <div class="item-actions">
+                <a href="{% url 'valider_compte' compte.id %}" class="btn btn-confirm">Activer</a>
+                <a href="{% url 'refuser_compte' compte.id %}"
+                   class="btn btn-danger"
+                   onclick="return confirm('Supprimer définitivement ce compte ?')">Refuser</a>
+            </div>
+        </div>
         {% empty %}
-            <p style="color: gray;">Aucun compte en attente.</p>
+        <div class="empty-state">Aucun compte en attente de validation</div>
         {% endfor %}
-    </ul>
+    </div>
 
-    <h2>2. Commandes de places en attente de virement</h2>
-    <ul>
+    <!-- COMMANDES EN ATTENTE -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <h2 class="dash-section-title">Commandes en attente</h2>
+            <span class="badge-count">{{ commandes|length }}</span>
+        </div>
+
         {% for commande in commandes %}
-            <li style="margin-bottom: 15px;">
-                <b>{{ commande.utilisateur.email }}</b> a demandé <b>{{ commande.nombre_de_places }}</b> place(s)
-                le {{ commande.date_demande|date:"d/m/Y à H:i" }}.
-                <a href="{% url 'valider_commande' commande.id %}" style="color: green; margin-left: 15px;">[ Valider le paiement ]</a>
-                <a href="{% url 'refuser_commande' commande.id %}" style="color: red; margin-left: 10px;" onclick="return confirm('Supprimer cette commande ?')">[ Refuser ]</a>
-            </li>
+        <div class="item-row">
+            <div class="item-main">
+                <p class="item-email">{{ commande.utilisateur.email }}</p>
+                <p class="item-meta">
+                    <strong style="color: var(--gray-200);">{{ commande.nombre_de_places }} place{% if commande.nombre_de_places > 1 %}s{% endif %}</strong>
+                    &nbsp;·&nbsp; {{ commande.date_demande|date:"d/m/Y à H:i" }}
+                </p>
+            </div>
+            <div class="item-actions">
+                <a href="{% url 'valider_commande' commande.id %}" class="btn btn-confirm">Valider</a>
+                <a href="{% url 'refuser_commande' commande.id %}"
+                   class="btn btn-danger"
+                   onclick="return confirm('Supprimer cette commande ?')">Refuser</a>
+            </div>
+        </div>
         {% empty %}
-            <p style="color: gray;">Aucune commande en attente.</p>
+        <div class="empty-state">Aucune commande en attente de virement</div>
         {% endfor %}
-    </ul>
+    </div>
 
-</body>
-</html>
+</div>
+{% endblock %}
