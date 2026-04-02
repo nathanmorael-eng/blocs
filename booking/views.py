@@ -22,21 +22,26 @@ def inscription(request):
     if request.method == 'POST':
         form = InscriptionAssosForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            email = form.cleaned_data.get('email', '')
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
             justification = form.cleaned_data.get('justification', '')
 
-            # Username généré automatiquement depuis l'email (ex: prenom.nom@... → prenom.nom)
+            # Vérifie si l'email existe déjà
+            if User.objects.filter(email=email).exists():
+                form.add_error('email', 'Un compte avec cet email existe déjà.')
+                return render(request, 'inscription.html', {'form': form})
+
+            # Génère un username depuis l'email
             username_base = email.split('@')[0]
             username = username_base
-            # Si le username existe déjà, on ajoute un numéro
             counter = 1
             while User.objects.filter(username=username).exists():
                 username = f"{username_base}{counter}"
                 counter += 1
 
-            user.username = username
-            user.email = email
+            # Crée l'utilisateur
+            user = User(username=username, email=email)
+            user.set_password(password)
 
             if email.endswith('@student-cs.fr') or email.endswith('@centralesupelec.fr'):
                 user.is_active = True
@@ -130,10 +135,26 @@ def dashboard_tresorier(request):
 # 3. L'action invisible pour valider un compte
 @user_passes_test(est_tresorier)
 def valider_compte(request, user_id):
-    user = get_object_or_404(User, id=user_id) # Trouve l'utilisateur
-    user.is_active = True # L'active
+    user = get_object_or_404(User, id=user_id)
+    user.is_active = True
     user.save()
-    return redirect('dashboard_tresorier') # Recharge la page
+
+    send_mail(
+        subject="Votre compte BLOCS a été validé",
+        message=f"""Bonjour,
+
+Votre compte a été validé par le trésorier. Vous pouvez maintenant vous connecter et commander vos places.
+
+Connectez-vous ici : http://127.0.0.1:8000/connexion/ #Il faudra modifier l'url quand on le mettra
+
+À bientôt sur BLOCS !
+""",
+        from_email='gars4196@gmail.com',
+        recipient_list=[user.email],
+        fail_silently=False,
+    )
+
+    return redirect('dashboard_tresorier')
 
 # 4. L'action invisible pour valider une commande
 @user_passes_test(est_tresorier)
@@ -183,7 +204,25 @@ Présentez ce(s) code(s) à l'accueil d'Arkose pour accéder à la salle.
 @user_passes_test(est_tresorier)
 def refuser_compte(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    user.delete() # Supprime l'utilisateur et son profil associé
+    email = user.email
+    user.delete()
+
+    send_mail(
+        subject="Votre demande de compte BLOCS",
+        message=f"""Bonjour,
+
+Votre demande de compte n'a pas pu être acceptée.
+
+Si vous pensez qu'il s'agit d'une erreur ou souhaitez plus d'informations, n'hésitez pas à recontacter le BDS de CentraleSupélec.
+
+Cordialement,
+Le BDS CentraleSupélec
+""",
+        from_email='gars4196@gmail.com',
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
     return redirect('dashboard_tresorier')
 
 # 2. Refuser (supprimer) une commande

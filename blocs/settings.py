@@ -128,5 +128,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'gars4196@gmail.com'
-EMAIL_HOST_PASSWORD = 'fzxntwnihpmdrbc'
+EMAIL_HOST_PASSWORD = 'yexi jgck euxa utqh'
 DEFAULT_FROM_EMAIL = 'gars4196@gmail.com'

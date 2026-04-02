@@ -1,214 +1,158 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Billetterie Arkose — BLOCS{% endblock %}
+{% block title %}BLOCS — Billetterie Arkose{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* ── HERO ── */
     .hero {
-        min-height: calc(100vh - 62px);
+        min-height: calc(100vh - 60px);
         display: grid;
         grid-template-columns: 1fr 1fr;
-        position: relative;
-        overflow: hidden;
     }
 
-    /* Colonne gauche : fond noir, texte */
+    /* Gauche — texte */
     .hero-left {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         padding: 80px 56px;
         position: relative;
-        z-index: 1;
-        background:
-            repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 79px,
-                rgba(255,255,255,0.015) 79px,
-                rgba(255,255,255,0.015) 80px
-            );
+        background: repeating-linear-gradient(
+            90deg,
+            transparent, transparent 79px,
+            rgba(255,255,255,0.012) 79px, rgba(255,255,255,0.012) 80px
+        );
     }
 
-    .hero-overline {
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.2em;
+    .hero-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
-        color: var(--gray-600);
-        margin-bottom: 24px;
+        color: var(--g600);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
         gap: 12px;
     }
-    .hero-overline::before {
-        content: '';
-        display: block;
-        width: 28px;
-        height: 1px;
-        background: var(--gray-600);
-    }
+    .hero-tag::before { content:''; display:block; width:28px; height:1px; background:var(--g600); }
 
     .hero-title {
-        font-family: var(--font-display);
-        font-size: clamp(3.5rem, 7vw, 7rem);
-        line-height: 0.92;
-        letter-spacing: 0.02em;
+        font-family: var(--display);
+        font-size: clamp(4rem, 8vw, 9rem);
+        line-height: 0.9;
         color: var(--white);
         margin-bottom: 28px;
     }
-    .hero-title .dim { color: var(--gray-600); }
+    .hero-title .muted { color: var(--g600); }
 
     .hero-sub {
-        font-size: 0.9rem;
-        color: var(--gray-400);
+        font-size: 0.95rem;
+        color: var(--g400);
         font-weight: 300;
         line-height: 1.7;
-        max-width: 340px;
+        max-width: 360px;
         margin-bottom: 48px;
     }
+    .hero-sub strong { color: var(--white); font-weight: 600; }
 
-    .hero-actions { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-    /* Colonne droite : fond blanc, logo centré */
+    /* Droite — logo sur blanc */
     .hero-right {
         background: var(--white);
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 60px;
         position: relative;
         overflow: hidden;
     }
-
     .hero-right::before {
         content: '';
         position: absolute;
         inset: 0;
-        background:
-            repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 24px,
-                rgba(0,0,0,0.025) 24px,
-                rgba(0,0,0,0.025) 25px
-            );
+        background: repeating-linear-gradient(
+            45deg,
+            transparent, transparent 24px,
+            rgba(0,0,0,0.03) 24px, rgba(0,0,0,0.03) 25px
+        );
     }
-
-    .logo-hero-wrap {
+    .hero-logo {
         position: relative;
         z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-    }
-
-    .logo-hero {
-        width: clamp(200px, 28vw, 340px);
+        width: clamp(180px, 24vw, 320px);
         height: auto;
-        display: block;
-        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.12));
+        filter: drop-shadow(0 12px 40px rgba(0,0,0,0.15));
+        animation: fadeUp 0.7s 0.2s ease both;
     }
-
-    .logo-tagline {
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: rgba(0,0,0,0.3);
-        margin-top: 8px;
-        text-align: center;
-    }
-
-    /* corner label */
     .hero-right-label {
         position: absolute;
-        bottom: 28px;
-        right: 28px;
-        font-size: 0.65rem;
-        font-weight: 600;
+        bottom: 24px; right: 24px;
+        font-size: 0.62rem;
+        font-weight: 700;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: rgba(0,0,0,0.2);
+        color: rgba(0,0,0,0.18);
         text-align: right;
-        line-height: 1.6;
+        line-height: 1.7;
         z-index: 1;
     }
 
-    /* ── BANDE CHIFFRES ── */
-    .stats-bar {
+    /* Steps */
+    .steps {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3,1fr);
         border-top: 1px solid rgba(255,255,255,0.06);
     }
-
-    .stat-cell {
-        padding: 40px 48px;
+    .step {
+        padding: 44px 48px;
         border-right: 1px solid rgba(255,255,255,0.06);
-        position: relative;
     }
-    .stat-cell:last-child { border-right: none; }
-
-    .stat-num {
-        font-family: var(--font-display);
-        font-size: 3rem;
+    .step:last-child { border-right: none; }
+    .step-num {
+        font-family: var(--display);
+        font-size: 3.2rem;
         line-height: 1;
         color: var(--white);
+        margin-bottom: 10px;
+    }
+    .step-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--g600);
         margin-bottom: 8px;
     }
-
-    .stat-label {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--gray-600);
-        margin-bottom: 6px;
-    }
-
-    .stat-desc {
-        font-size: 0.82rem;
-        color: var(--gray-400);
+    .step-desc {
+        font-size: 0.85rem;
+        color: var(--g400);
         font-weight: 300;
-        line-height: 1.5;
+        line-height: 1.6;
     }
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-
-    .hero-overline { animation: fadeUp 0.5s ease both; }
-    .hero-title    { animation: fadeUp 0.5s 0.08s ease both; }
-    .hero-sub      { animation: fadeUp 0.5s 0.16s ease both; }
-    .hero-actions  { animation: fadeUp 0.5s 0.24s ease both; }
-    .hero-right    { animation: fadeIn 0.7s 0.1s ease both; }
-    .logo-hero     { animation: fadeUp 0.6s 0.2s ease both; }
+    /* animations */
+    .hero-tag    { animation: fadeUp 0.5s 0.0s ease both; }
+    .hero-title  { animation: fadeUp 0.5s 0.08s ease both; }
+    .hero-sub    { animation: fadeUp 0.5s 0.16s ease both; }
+    .hero-actions{ animation: fadeUp 0.5s 0.24s ease both; }
 </style>
 {% endblock %}
 
 {% block content %}
-
 <section class="hero">
-    <!-- Gauche : texte -->
     <div class="hero-left">
-        <p class="hero-overline">Billetterie associative · CentraleSupélec</p>
+        <p class="hero-tag">Billetterie associative · CentraleSupélec</p>
         <h1 class="hero-title">
             PLACES<br>
             ARKOSE<br>
-            <span class="dim">BDS CS</span>
+            <span class="muted">7 €</span>
         </h1>
         <p class="hero-sub">
-            Commandez vos entrées escalade au tarif associatif.
-            Réservé aux étudiants de CentraleSupélec.
+            Les soirées BDE sont financées par <strong>BLOCS</strong>.<br>
+            Commandez vos entrées escalade au tarif associatif,<br>
+            réservé aux étudiants de CentraleSupélec.
         </p>
         <div class="hero-actions">
             <a href="/connexion/" class="btn btn-primary">Se connecter →</a>
@@ -216,35 +160,26 @@
         </div>
     </div>
 
-    <!-- Droite : logo sur fond blanc -->
     <div class="hero-right">
-        <div class="logo-hero-wrap">
-            <img src="{% static 'img/logo_blocs.png' %}" alt="Logo BLOCS" class="logo-hero">
-            <p class="logo-tagline">Club escalade · CentraleSupélec</p>
-        </div>
-        <div class="hero-right-label">
-            Arkose Nation<br>Paris
-        </div>
+        <img src="{% static 'img/logo_blocs.png' %}" alt="Logo BLOCS" class="hero-logo">
     </div>
 </section>
 
-<!-- Bande étapes -->
-<div class="stats-bar">
-    <div class="stat-cell">
-        <p class="stat-label">Étape 01</p>
-        <div class="stat-num">S'inscrire</div>
-        <p class="stat-desc">Avec votre adresse @student-cs.fr ou @centralesupelec.fr pour une validation instantanée.</p>
+<div class="steps">
+    <div class="step">
+        <p class="step-label">Étape 01</p>
+        <div class="step-num">S'inscrire</div>
+        <p class="step-desc">Avec votre adresse @student-cs.fr ou @centralesupelec.fr pour une activation instantanée.</p>
     </div>
-    <div class="stat-cell">
-        <p class="stat-label">Étape 02</p>
-        <div class="stat-num">Commander</div>
-        <p class="stat-desc">Choisissez le nombre de places. Elles sont réservées dès votre commande confirmée.</p>
+    <div class="step">
+        <p class="step-label">Étape 02</p>
+        <div class="step-num">Commander</div>
+        <p class="step-desc">Choisissez le nombre de places souhaitées. Elles sont réservées dès validation de votre commande.</p>
     </div>
-    <div class="stat-cell">
-        <p class="stat-label">Étape 03</p>
-        <div class="stat-num">Grimper</div>
-        <p class="stat-desc">Après validation du virement, vos codes arrivent directement dans votre boîte mail.</p>
+    <div class="step">
+        <p class="step-label">Étape 03</p>
+        <div class="step-num">Grimper</div>
+        <p class="step-desc">Une fois votre virement reçu et validé, vos codes d'entrée arrivent directement par email.</p>
     </div>
 </div>
-
 {% endblock %}

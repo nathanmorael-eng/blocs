@@ -1,250 +1,198 @@
 {% extends "base.html" %}
-{% block title %}Trésorier — Arkose BLOCS{% endblock %}
+{% block title %}Trésorier — BLOCS{% endblock %}
 
 {% block extra_css %}
 <style>
-    .dash-layout {
-        padding: 60px 48px 80px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
+    .dash { padding: 56px 48px 80px; max-width: 980px; margin: 0 auto; }
 
+    /* Header */
     .dash-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        margin-bottom: 48px;
         padding-bottom: 28px;
-        border-bottom: 1px solid rgba(255,255,255,0.07);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: 48px;
     }
-
     .dash-title {
-        font-family: var(--font-display);
-        font-size: 3rem;
+        font-family: var(--display);
+        font-size: 2.8rem;
         letter-spacing: 0.04em;
         line-height: 1;
     }
-
-    .stock-badge {
-        text-align: right;
-    }
+    .stock-block { text-align: right; }
     .stock-num {
-        font-family: var(--font-display);
-        font-size: 3rem;
+        font-family: var(--display);
+        font-size: 2.8rem;
         line-height: 1;
-        color: var(--white);
     }
-    .stock-num.low { color: #d45555; }
-    .stock-label {
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--gray-600);
-        margin-bottom: 6px;
-    }
-    .stock-link {
-        font-size: 0.75rem;
-        color: var(--gray-600);
-        text-decoration: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 1px;
-        transition: color 0.2s;
-    }
-    .stock-link:hover { color: var(--gray-200); }
+    .stock-num.low { color: var(--red); }
+    .stock-meta { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g600); margin-bottom: 4px; }
+    .stock-link { font-size: 0.74rem; color: var(--g600); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1px; transition: color 0.2s; }
+    .stock-link:hover { color: var(--g200); }
 
-    /* ── SECTION ── */
-    .dash-section { margin-bottom: 52px; }
-
-    .dash-section-header {
+    /* Sections */
+    .dash-section { margin-bottom: 48px; }
+    .section-head {
         display: flex;
         align-items: center;
-        gap: 14px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 18px;
     }
-
-    .dash-section-title {
-        font-family: var(--font-display);
-        font-size: 1.4rem;
+    .section-title {
+        font-family: var(--display);
+        font-size: 1.5rem;
         letter-spacing: 0.06em;
     }
-
-    .badge-count {
-        background: rgba(255,255,255,0.07);
-        color: var(--gray-400);
-        font-size: 0.72rem;
-        font-weight: 600;
+    .count-pill {
+        background: rgba(255,255,255,0.06);
+        color: var(--g400);
+        font-size: 0.7rem;
+        font-weight: 700;
         letter-spacing: 0.1em;
         padding: 3px 10px;
         border-radius: 20px;
     }
 
-    
-
-    /* ── ROWS ── */
-    .item-row {
+    /* Rows */
+    .row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 18px 24px;
+        gap: 20px;
+        padding: 16px 22px;
         border: 1px solid rgba(255,255,255,0.06);
         border-radius: 3px;
         margin-bottom: 8px;
         background: rgba(255,255,255,0.02);
         transition: background 0.15s;
     }
-    .item-row:hover { background: rgba(255,255,255,0.035); }
+    .row:hover { background: rgba(255,255,255,0.035); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-email { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-meta  { font-size: 0.76rem; color: var(--g600); font-weight: 300; }
+    .row-justif{ font-size: 0.78rem; color: var(--g400); font-style: italic; margin-top: 4px; }
+    .row-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-    .item-main { flex: 1; }
-
-    .item-email {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--white);
-        margin-bottom: 4px;
-    }
-
-    .item-meta {
-        font-size: 0.75rem;
-        color: var(--gray-600);
-        font-weight: 300;
-    }
-
-    .item-justif {
-        font-size: 0.78rem;
-        color: var(--gray-400);
-        font-style: italic;
-        margin-top: 5px;
-        max-width: 480px;
-    }
-
-    .item-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-shrink: 0;
-        margin-left: 24px;
-    }
-
-    .empty-state {
-        padding: 32px 24px;
-        border: 1px dashed rgba(255,255,255,0.08);
+    .empty {
+        padding: 28px 22px;
+        border: 1px dashed rgba(255,255,255,0.07);
         border-radius: 3px;
         text-align: center;
-        color: var(--gray-600);
+        color: var(--g600);
         font-size: 0.82rem;
         letter-spacing: 0.06em;
     }
 
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
+    /* Import */
+    .import-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 22px 28px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 3px;
     }
-    .item-row { animation: fadeUp 0.3s ease both; }
-    .item-row:nth-child(2) { animation-delay: 0.05s; }
-    .item-row:nth-child(3) { animation-delay: 0.1s; }
-    .item-row:nth-child(4) { animation-delay: 0.15s; }
+    .import-desc { font-size: 0.84rem; color: var(--g400); font-weight: 300; line-height: 1.6; }
+    .import-desc small { font-size: 0.73rem; color: var(--g600); display: block; margin-top: 3px; }
+    .import-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .file-name { font-size: 0.75rem; color: var(--g600); min-width: 100px; }
+
+    label.btn { cursor: pointer; }
+
+    /* anims */
+    .row { animation: fadeUp 0.3s ease both; }
+    .row:nth-child(2) { animation-delay: 0.04s; }
+    .row:nth-child(3) { animation-delay: 0.08s; }
+    .row:nth-child(4) { animation-delay: 0.12s; }
 </style>
 {% endblock %}
 
-<!-- Messages flash -->
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}" style="margin-bottom: 24px;">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-<!-- Import Excel -->
-<div class="dash-section">
-    <div class="dash-section-header">
-        <h2 class="dash-section-title">Importer des billets</h2>
-    </div>
-    <div class="card" style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
-        <div>
-            <p style="font-size: 0.85rem; color: var(--gray-400); font-weight: 300; line-height: 1.6;">
-                Importez un fichier Excel Arkose. Les codes de la colonne B seront ajoutés au stock.<br>
-                <span style="font-size: 0.75rem; color: var(--gray-600);">Les doublons sont automatiquement ignorés.</span>
-            </p>
-        </div>
-        <form method="POST" action="{% url 'importer_billets' %}" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-            {% csrf_token %}
-            <label for="fichier_excel" class="btn btn-outline btn-sm" style="cursor: pointer; margin: 0;">
-                Choisir un fichier
-            </label>
-            <input type="file" id="fichier_excel" name="fichier_excel" accept=".xlsx,.xls" style="display: none;" onchange="this.nextElementSibling.textContent = this.files[0]?.name || 'Aucun fichier'; ">
-            <span style="font-size: 0.78rem; color: var(--gray-600); min-width: 120px;">Aucun fichier</span>
-            <button type="submit" class="btn btn-primary btn-sm">Importer →</button>
-        </form>
-    </div>
-</div>
-
 {% block content %}
-<div class="dash-layout">
+<div class="dash">
 
+    <!-- En-tête -->
     <div class="dash-header">
         <div>
-            <p class="overline" style="margin-bottom: 10px;">Espace trésorier</p>
+            <p class="overline" style="margin-bottom:10px;">Espace trésorier</p>
             <h1 class="dash-title">Tableau de bord</h1>
         </div>
-        <div class="stock-badge">
-            <p class="stock-label">Stock disponible</p>
+        <div class="stock-block">
+            <p class="stock-meta">Stock disponible</p>
             <p class="stock-num {% if stock_disponible == 0 %}low{% endif %}">{{ stock_disponible }}</p>
-            <a href="/admin/booking/billetarkose/add/" target="_blank" class="stock-link">+ Ajouter des billets</a>
         </div>
     </div>
 
-    <!-- COMPTES EN ATTENTE -->
+    <!-- Import Excel -->
     <div class="dash-section">
-        <div class="dash-section-header">
-            <h2 class="dash-section-title">Comptes en attente</h2>
-            <span class="badge-count">{{ comptes|length }}</span>
+        <div class="section-head">
+            <h2 class="section-title">Importer des billets</h2>
         </div>
-
-        {% for compte in comptes %}
-        <div class="item-row">
-            <div class="item-main">
-                <p class="item-email">{{ compte.email }}</p>
-                <p class="item-justif">{{ compte.profil.justification|default:"Aucune justification fournie." }}</p>
+        <div class="import-card">
+            <div class="import-desc">
+                Importez un fichier Excel Arkose (.xls / .xlsx).<br>
             </div>
-            <div class="item-actions">
-                <a href="{% url 'valider_compte' compte.id %}" class="btn btn-confirm">Activer</a>
-                <a href="{% url 'refuser_compte' compte.id %}"
-                   class="btn btn-danger"
+            <form method="POST" action="{% url 'importer_billets' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="import-actions">
+                    <label for="fichier_excel" class="btn btn-outline btn-sm">Choisir un fichier</label>
+                    <input type="file" id="fichier_excel" name="fichier_excel" accept=".xlsx,.xls" style="display:none;"
+                           onchange="document.getElementById('file-name').textContent = this.files[0]?.name || 'Aucun fichier'">
+                    <span id="file-name" class="file-name">Aucun fichier</span>
+                    <button type="submit" class="btn btn-primary btn-sm">Importer →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comptes en attente -->
+    <div class="dash-section">
+        <div class="section-head">
+            <h2 class="section-title">Comptes en attente</h2>
+            <span class="count-pill">{{ comptes|length }}</span>
+        </div>
+        {% for compte in comptes %}
+        <div class="row">
+            <div class="row-main">
+                <p class="row-email">{{ compte.email }}</p>
+                <p class="row-justif">{{ compte.profil.justification|default:"Aucune justification fournie." }}</p>
+            </div>
+            <div class="row-actions">
+                <a href="{% url 'valider_compte' compte.id %}" class="btn btn-ok btn-sm">Activer</a>
+                <a href="{% url 'refuser_compte' compte.id %}" class="btn btn-ko btn-sm"
                    onclick="return confirm('Supprimer définitivement ce compte ?')">Refuser</a>
             </div>
         </div>
         {% empty %}
-        <div class="empty-state">Aucun compte en attente de validation</div>
+        <div class="empty">Aucun compte en attente de validation</div>
         {% endfor %}
     </div>
 
-    <!-- COMMANDES EN ATTENTE -->
+    <!-- Commandes en attente -->
     <div class="dash-section">
-        <div class="dash-section-header">
-            <h2 class="dash-section-title">Commandes en attente</h2>
-            <span class="badge-count">{{ commandes|length }}</span>
+        <div class="section-head">
+            <h2 class="section-title">Commandes en attente</h2>
+            <span class="count-pill">{{ commandes|length }}</span>
         </div>
-
         {% for commande in commandes %}
-        <div class="item-row">
-            <div class="item-main">
-                <p class="item-email">{{ commande.utilisateur.email }}</p>
-                <p class="item-meta">
-                    <strong style="color: var(--gray-200);">{{ commande.nombre_de_places }} place{% if commande.nombre_de_places > 1 %}s{% endif %}</strong>
-                    &nbsp;·&nbsp; {{ commande.date_demande|date:"d/m/Y à H:i" }}
+        <div class="row">
+            <div class="row-main">
+                <p class="row-email">{{ commande.utilisateur.email }}</p>
+                <p class="row-meta">
+                    <strong style="color:var(--g200);">{{ commande.nombre_de_places }} place{% if commande.nombre_de_places > 1 %}s{% endif %}</strong>
+                    &nbsp;·&nbsp; {{ commande.date_demande|date:"d/m/Y" }}
                 </p>
             </div>
-            <div class="item-actions">
-                <a href="{% url 'valider_commande' commande.id %}" class="btn btn-confirm">Valider</a>
-                <a href="{% url 'refuser_commande' commande.id %}"
-                   class="btn btn-danger"
+            <div class="row-actions">
+                <a href="{% url 'valider_commande' commande.id %}" class="btn btn-ok btn-sm">Valider</a>
+                <a href="{% url 'refuser_commande' commande.id %}" class="btn btn-ko btn-sm"
                    onclick="return confirm('Supprimer cette commande ?')">Refuser</a>
             </div>
         </div>
         {% empty %}
-        <div class="empty-state">Aucune commande en attente de virement</div>
+        <div class="empty">Aucune commande en attente de virement</div>
         {% endfor %}
     </div>
 

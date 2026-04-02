@@ -12,21 +12,20 @@ class CommandeForm(forms.ModelForm):
             'nombre_de_places': 'Combien de places souhaitez-vous ?'
         }
 
-class InscriptionAssosForm(UserCreationForm):
+class InscriptionAssosForm(forms.Form):
     email = forms.EmailField(
         required=True,
         help_text="Utilisez votre adresse @student-cs.fr ou @centralesupelec.fr."
     )
+    password = forms.CharField(
+        label="Mot de passe (date de naissance ddmmyyyy)",
+        widget=forms.PasswordInput,
+        required=True
+    )
     justification = forms.CharField(
         widget=forms.Textarea,
-        required=False,
-        help_text="Remplissez ce champ si vous n'avez pas d'adresse CentraleSupélec."
+        required=False
     )
-
-    class Meta(UserCreationForm.Meta):
-        model = User
-        # Plus de champ username — seulement email + mots de passe
-        fields = ('email', 'password1', 'password2')
 
 class ConnexionEmailForm(forms.Form):
     email = forms.EmailField(label="Adresse email")
@@ -46,10 +45,11 @@ class ConnexionEmailForm(forms.Form):
 
             # On vérifie le mot de passe
             user = authenticate(username=user_obj.username, password=password)
+            if not user_obj.is_active:
+                raise forms.ValidationError("Votre compte est en attente de validation par le trésorier.")
+            user = authenticate(username=user_obj.username, password=password)
             if user is None:
                 raise forms.ValidationError("Mot de passe incorrect.")
-            if not user.is_active:
-                raise forms.ValidationError("Votre compte est en attente de validation.")
 
             # On stocke l'utilisateur pour le récupérer dans la vue
             self.user = user

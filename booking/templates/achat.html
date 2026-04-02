@@ -1,175 +1,124 @@
 {% extends "base.html" %}
-{% block title %}Commander — Arkose BLOCS{% endblock %}
+{% block title %}Commander — BLOCS{% endblock %}
 
 {% block extra_css %}
 <style>
-    .achat-layout {
-        min-height: calc(100vh - 62px);
+    .achat-wrap {
+        min-height: calc(100vh - 60px);
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 80px 40px;
     }
 
-    .achat-card {
-        width: 100%;
-        max-width: 520px;
-    }
-
-    .achat-header {
-        margin-bottom: 48px;
-    }
+    .achat-panel { width: 100%; max-width: 500px; animation: fadeUp 0.5s ease both; }
 
     .achat-title {
-        font-family: var(--font-display);
+        font-family: var(--display);
         font-size: 3.2rem;
-        letter-spacing: 0.04em;
-        line-height: 1;
-        margin-bottom: 12px;
+        line-height: 0.95;
+        margin-bottom: 10px;
     }
 
     .achat-user {
         font-size: 0.8rem;
-        color: var(--gray-600);
+        color: var(--g600);
         display: flex;
         align-items: center;
         gap: 8px;
+        margin-bottom: 40px;
     }
     .achat-user::before {
         content: '';
         display: block;
-        width: 6px;
-        height: 6px;
+        width: 6px; height: 6px;
         border-radius: 50%;
-        background: #55b97a;
+        background: var(--green);
     }
 
-    .price-info {
-        background: rgba(255,255,255,0.025);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 3px;
-        padding: 24px 28px;
-        margin-bottom: 36px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .price-label {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--gray-600);
-        margin-bottom: 4px;
-    }
-
-    .price-val {
-        font-family: var(--font-display);
-        font-size: 2rem;
-        color: var(--white);
-    }
-
-    .virement-info {
-        border-top: 1px solid rgba(255,255,255,0.06);
+    .how-it-works {
+        margin-top: 36px;
         padding-top: 28px;
-        margin-top: 28px;
+        border-top: 1px solid rgba(255,255,255,0.06);
     }
-
-    .virement-steps { list-style: none; }
-    .virement-steps li {
+    .steps-mini { list-style: none; margin-top: 14px; }
+    .steps-mini li {
         display: flex;
         gap: 14px;
-        align-items: flex-start;
-        font-size: 0.85rem;
-        color: var(--gray-400);
-        margin-bottom: 12px;
+        font-size: 0.84rem;
+        color: var(--g400);
+        font-weight: 300;
         line-height: 1.5;
+        margin-bottom: 10px;
     }
-    .virement-steps li span.step-num {
-        font-family: var(--font-display);
+    .steps-mini li span {
+        font-family: var(--display);
         font-size: 1rem;
-        color: var(--gray-600);
-        min-width: 20px;
+        color: var(--g600);
+        min-width: 18px;
     }
 
-    /* success state */
-    .success-state { text-align: center; padding: 60px 0; }
+    /* success */
+    .success-wrap { text-align: center; padding: 60px 0; }
     .success-icon {
-        font-family: var(--font-display);
+        font-family: var(--display);
         font-size: 5rem;
-        color: rgba(85,185,122,0.3);
-        margin-bottom: 24px;
+        color: rgba(90,185,123,0.25);
+        margin-bottom: 20px;
     }
     .success-title {
-        font-family: var(--font-display);
-        font-size: 2.4rem;
-        margin-bottom: 12px;
+        font-family: var(--display);
+        font-size: 2.6rem;
+        margin-bottom: 10px;
     }
     .success-sub {
-        color: var(--gray-400);
         font-size: 0.9rem;
+        color: var(--g400);
         font-weight: 300;
-        line-height: 1.6;
+        line-height: 1.7;
         max-width: 340px;
-        margin: 0 auto 36px;
+        margin: 0 auto 32px;
     }
-
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    .achat-card { animation: fadeUp 0.5s ease both; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="achat-layout">
-    <div class="achat-card">
+<div class="achat-wrap">
+    <div class="achat-panel">
 
         {% if message %}
-        <div class="success-state">
+        <div class="success-wrap">
             <div class="success-icon">✓</div>
             <h2 class="success-title">Réservation confirmée</h2>
             <p class="success-sub">{{ message }}</p>
             <a href="/" class="btn btn-outline">Retour à l'accueil</a>
         </div>
 
-        {% elif erreur %}
-        <div class="achat-header">
-            <h1 class="achat-title">Commander</h1>
-            <p class="achat-user">{{ user.email }}</p>
-        </div>
-        <div class="alert alert-error">{{ erreur }}</div>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:28px; justify-content:center;">
-                Confirmer la réservation →
-            </button>
-        </form>
-
         {% else %}
-        <div class="achat-header">
-            <p class="overline" style="margin-bottom:12px;">Billetterie Arkose</p>
-            <h1 class="achat-title">Commander<br>des places</h1>
-            <p class="achat-user">{{ user.email }}</p>
-        </div>
+        <p class="overline" style="margin-bottom:14px;">Billetterie Arkose</p>
+        <h1 class="achat-title">Commander<br>des places</h1>
+        <p class="achat-user">{{ user.email }}</p>
+
+        {% if erreur %}
+            <div style="padding:12px 16px; background:rgba(201,85,85,0.08); border-left:3px solid var(--red); color:var(--red); font-size:0.88rem; margin-bottom:24px; border-radius:1px;">
+                {{ erreur }}
+            </div>
+        {% endif %}
 
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:28px; justify-content:center;">
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:24px; justify-content:center;">
                 Confirmer la réservation →
             </button>
         </form>
 
-        <div class="virement-info">
-            <p class="overline" style="margin-bottom: 16px;">Comment ça marche</p>
-            <ul class="virement-steps">
-                <li><span class="step-num">1.</span> Validez votre commande ci-dessus — les places sont réservées immédiatement.</li>
-                <li><span class="step-num">2.</span> Effectuez un virement bancaire au trésorier du BDS.</li>
-                <li><span class="step-num">3.</span> Une fois le paiement validé, vos codes vous seront envoyés par email.</li>
+        <div class="how-it-works">
+            <p class="overline">Comment ça marche</p>
+            <ul class="steps-mini">
+                <li><span>1.</span> Vos places sont réservées dès validation de votre commande.</li>
+                <li><span>2.</span> Effectuez un virement bancaire au trésorier de BLOCS.</li>
+                <li><span>3.</span> Une fois le paiement confirmé, vos codes d'entrée vous sont envoyés par email.</li>
             </ul>
         </div>
         {% endif %}

@@ -1,115 +1,109 @@
 {% extends "base.html" %}
-{% block title %}Connexion — Arkose BLOCS{% endblock %}
+{% block title %}Connexion — BLOCS{% endblock %}
 
 {% block extra_css %}
 <style>
-    .auth-layout {
-        min-height: calc(100vh - 62px);
+    .auth-wrap {
+        min-height: calc(100vh - 60px);
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
 
-    .auth-side {
+    .auth-form-side {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 80px 60px;
+        padding: 80px 64px;
     }
 
-    .auth-panel { width: 100%; max-width: 400px; }
-
-    .auth-visual {
-        background:
-            repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 39px,
-                rgba(255,255,255,0.02) 39px,
-                rgba(255,255,255,0.02) 40px
-            );
-        border-left: 1px solid rgba(255,255,255,0.06);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 60px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .auth-visual-title {
-        font-family: var(--font-display);
-        font-size: clamp(4rem, 8vw, 8rem);
-        line-height: 0.9;
-        color: rgba(255,255,255,0.06);
-        user-select: none;
-    }
+    .auth-panel { width: 100%; max-width: 380px; animation: fadeUp 0.5s ease both; }
 
     .auth-title {
-        font-family: var(--font-display);
-        font-size: 2.8rem;
+        font-family: var(--display);
+        font-size: 3.2rem;
         letter-spacing: 0.04em;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        line-height: 1;
     }
-
     .auth-sub {
-        font-size: 0.85rem;
-        color: var(--gray-400);
-        margin-bottom: 40px;
+        font-size: 0.88rem;
+        color: var(--g400);
         font-weight: 300;
+        margin-bottom: 40px;
+        line-height: 1.5;
     }
 
-    .auth-footer-link {
-        margin-top: 28px;
+    .auth-link {
+        margin-top: 24px;
         font-size: 0.82rem;
-        color: var(--gray-600);
+        color: var(--g600);
     }
-    .auth-footer-link a {
-        color: var(--gray-200);
+    .auth-link a {
+        color: var(--g200);
         text-decoration: none;
         border-bottom: 1px solid rgba(255,255,255,0.15);
         padding-bottom: 1px;
         transition: border-color 0.2s;
     }
-    .auth-footer-link a:hover { border-color: var(--white); }
+    .auth-link a:hover { border-color: var(--white); }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(-16px); }
-        to   { opacity: 1; transform: translateX(0); }
+    .auth-note {
+        margin-top: 14px;
+        font-size: 0,78rem;
+        color: var(--g600);
+        font-style: italic;
     }
-    .auth-panel { animation: fadeIn 0.5s ease both; }
+
+    /* Déco droite */
+    .auth-deco {
+        background: var(--g800);
+        border-left: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        overflow: hidden;
+        position: relative;
+        background: repeating-linear-gradient(
+            -45deg,
+            transparent, transparent 39px,
+            rgba(255,255,255,0.012) 39px, rgba(255,255,255,0.012) 40px
+        );
+    }
+    .deco-text {
+        font-family: var(--display);
+        font-size: clamp(5rem, 10vw, 10rem);
+        line-height: 0.88;
+        color: rgba(255,255,255,0.04);
+        user-select: none;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-layout">
-    <div class="auth-side">
+<div class="auth-wrap">
+    <div class="auth-form-side">
         <div class="auth-panel">
-            <p class="overline" style="margin-bottom: 16px;">Espace membre</p>
+            <p class="overline" style="margin-bottom:14px;">Espace membre</p>
             <h1 class="auth-title">Connexion</h1>
-            <p class="auth-sub">Accédez à votre espace de réservation.</p>
-
-            {% if form.non_field_errors %}
-                <div class="alert alert-error">{{ form.non_field_errors }}</div>
-            {% endif %}
+            <p class="auth-sub">Accédez à votre espace de réservation de places Arkose.</p>
 
             <form method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 28px; justify-content: center;">
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:24px; justify-content:center;">
                     Se connecter →
                 </button>
             </form>
 
-            <p class="auth-footer-link">
-                Pas encore de compte ? <a href="/inscription/">Créer un compte</a>
-            </p>
+            <p class="auth-link">Pas encore de compte ? <a href="/inscription/">Créer un compte</a></p>
+            <p class="auth-note">Mot de passe oublié ? Contactez le trésorier de BLOCS.</p>
         </div>
     </div>
 
-    <div class="auth-visual">
-        <div class="auth-visual-title">
-            ARKOSE<br>BLOCS<br>CS
-        </div>
+    <div class="auth-deco">
+        <div class="deco-text">BLOCS<br>ARKOSE<br>CS</div>
     </div>
 </div>
 {% endblock %}

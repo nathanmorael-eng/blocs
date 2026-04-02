@@ -1,71 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Inscription — Arkose BLOCS{% endblock %}
+{% block title %}Inscription — BLOCS{% endblock %}
 
 {% block extra_css %}
 <style>
-    .auth-layout {
-        min-height: calc(100vh - 62px);
+    .auth-wrap {
+        min-height: calc(100vh - 60px);
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
 
-    .auth-side {
+    .auth-form-side {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 80px 60px;
+        padding: 80px 64px;
     }
 
-    .auth-panel { width: 100%; max-width: 420px; }
-
-    .auth-visual {
-        background:
-            repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 39px,
-                rgba(255,255,255,0.02) 39px,
-                rgba(255,255,255,0.02) 40px
-            );
-        border-left: 1px solid rgba(255,255,255,0.06);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 60px;
-    }
-
-    .auth-visual-title {
-        font-family: var(--font-display);
-        font-size: clamp(4rem, 8vw, 8rem);
-        line-height: 0.9;
-        color: rgba(255,255,255,0.06);
-        user-select: none;
-    }
+    .auth-panel { width: 100%; max-width: 400px; animation: fadeUp 0.5s ease both; }
 
     .auth-title {
-        font-family: var(--font-display);
-        font-size: 2.8rem;
+        font-family: var(--display);
+        font-size: 3.2rem;
         letter-spacing: 0.04em;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        line-height: 1;
     }
-
     .auth-sub {
-        font-size: 0.85rem;
-        color: var(--gray-400);
-        margin-bottom: 40px;
+        font-size: 0.88rem;
+        color: var(--g400);
         font-weight: 300;
+        margin-bottom: 32px;
         line-height: 1.6;
     }
 
-    .badge-cs {
+    .badge-auto {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        background: rgba(85,185,122,0.08);
-        border: 1px solid rgba(85,185,122,0.2);
-        color: #55b97a;
-        font-size: 0.72rem;
-        font-weight: 600;
+        gap: 6px;
+        background: rgba(90,185,123,0.08);
+        border: 1px solid rgba(90,185,123,0.2);
+        color: var(--green);
+        font-size: 0.7rem;
+        font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         padding: 5px 12px;
@@ -73,59 +49,179 @@
         margin-bottom: 28px;
     }
 
-    .auth-footer-link {
-        margin-top: 24px;
+    .auth-link {
+        margin-top: 20px;
         font-size: 0.82rem;
-        color: var(--gray-600);
+        color: var(--g600);
     }
-    .auth-footer-link a {
-        color: var(--gray-200);
+    .auth-link a {
+        color: var(--g200);
         text-decoration: none;
         border-bottom: 1px solid rgba(255,255,255,0.15);
         padding-bottom: 1px;
         transition: border-color 0.2s;
     }
-    .auth-footer-link a:hover { border-color: var(--white); }
+    .auth-link a:hover { border-color: var(--white); }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(-16px); }
-        to   { opacity: 1; transform: translateX(0); }
+    /* Déco droite */
+    .auth-deco {
+        border-left: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        overflow: hidden;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent, transparent 39px,
+            rgba(255,255,255,0.012) 39px, rgba(255,255,255,0.012) 40px
+        );
     }
-    .auth-panel { animation: fadeIn 0.5s ease both; }
+    .deco-text {
+        font-family: var(--display);
+        font-size: clamp(5rem, 10vw, 10rem);
+        line-height: 0.88;
+        color: rgba(255,255,255,0.04);
+        user-select: none;
+    }
+
+    /* Pop-up */
+    #popup-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    .popup-box {
+        background: var(--g800);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 36px;
+        border-radius: 4px;
+        max-width: 460px;
+        width: 90%;
+    }
+    .popup-box h3 {
+        font-family: var(--display);
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+        letter-spacing: 0.04em;
+    }
+    .popup-box p {
+        font-size: 0.85rem;
+        color: var(--g400);
+        margin-bottom: 18px;
+        line-height: 1.6;
+        font-weight: 300;
+    }
+    .popup-box textarea {
+        width: 100%;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--white);
+        padding: 10px 14px;
+        font-family: var(--body);
+        font-size: 0.9rem;
+        border-radius: 2px;
+        outline: none;
+        resize: vertical;
+    }
+    .popup-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 16px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-layout">
-    <div class="auth-side">
+<div class="auth-wrap">
+    <div class="auth-form-side">
         <div class="auth-panel">
-            <p class="overline" style="margin-bottom: 16px;">Nouveau membre</p>
+            <p class="overline" style="margin-bottom:14px;">Nouveau membre</p>
             <h1 class="auth-title">Inscription</h1>
             <p class="auth-sub">
-                Réservé aux étudiants de CentraleSupélec.<br>
-                Les comptes extérieurs nécessitent une validation manuelle.
+                Vos places seront envoyées à l'adresse email d'inscription.<br>
             </p>
 
-            <span class="badge-cs">✓ Validation automatique @student-cs.fr</span>
-
-            <form method="POST">
+            <form method="POST" id="form-inscription">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 28px; justify-content: center;">
+
+                <div class="field">
+                    <label for="id_email">Adresse email</label>
+                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required placeholder="prenom.nom@student-cs.fr">
+                    {% if form.email.errors %}
+                        <ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_password">Mot de passe — votre date de naissance au format ddmmyyyy</label>
+                    <input type="password" name="password" id="id_password" required placeholder="ex : 15032001">
+                </div>
+
+                <input type="hidden" name="justification" id="id_justification">
+
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:8px; justify-content:center;">
                     Créer mon compte →
                 </button>
             </form>
 
-            <p class="auth-footer-link">
-                Déjà un compte ? <a href="/connexion/">Se connecter</a>
-            </p>
+            <p class="auth-link">Déjà un compte ? <a href="/connexion/">Se connecter</a></p>
         </div>
     </div>
 
-    <div class="auth-visual">
-        <div class="auth-visual-title">
-            GRIMPE<br>CS<br>2025
+    <div class="auth-deco">
+        <div class="deco-text">GRIMPE<br>CS<br>BLOCS</div>
+    </div>
+</div>
+
+<!-- Pop-up justification -->
+<div id="popup-overlay">
+    <div class="popup-box">
+        <h3>Justification requise</h3>
+        <p>
+            Votre adresse email n'est pas une adresse CentraleSupélec.<br>
+            Expliquez pourquoi vous souhaitez accéder à la billetterie BLOCS. Le trésorier examinera votre demande.
+        </p>
+        <textarea id="justification-input" rows="4" placeholder="Votre justification..."></textarea>
+        <div class="popup-actions">
+            <button onclick="fermerPopup()" class="btn btn-outline btn-sm">Annuler</button>
+            <button onclick="validerJustification()" class="btn btn-primary btn-sm">Valider →</button>
         </div>
     </div>
 </div>
+
+<script>
+    const emailInput   = document.getElementById('id_email');
+    const formEl       = document.getElementById('form-inscription');
+    const overlay      = document.getElementById('popup-overlay');
+    const justifInput  = document.getElementById('justification-input');
+    const justifHidden = document.getElementById('id_justification');
+
+    function estEmailCS(email) {
+        return email.endsWith('@student-cs.fr') || email.endsWith('@centralesupelec.fr');
+    }
+    function ouvrirPopup() { overlay.style.display = 'flex'; justifInput.focus(); }
+    function fermerPopup() { overlay.style.display = 'none'; }
+    function validerJustification() {
+        justifHidden.value = justifInput.value;
+        fermerPopup();
+        formEl.submit();
+    }
+
+    formEl.addEventListener('submit', function(e) {
+        if (!estEmailCS(emailInput.value) && justifHidden.value === '') {
+            e.preventDefault();
+            ouvrirPopup();
+        }
+    });
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) fermerPopup();
+    });
+</script>
 {% endblock %}
